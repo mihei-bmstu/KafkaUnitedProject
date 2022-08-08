@@ -38,6 +38,6 @@ lazy val producer = (project in file("./moduleProducer"))
 lazy val dstream = (project in file("./moduleDStream"))
   .settings(
     name := "DStream",
-    libraryDependencies ++= Seq(sparkStream, streamKafka)
+    libraryDependencies ++= Seq(sparkStream, streamKafka, pgDriver)
   )
   .dependsOn(root)

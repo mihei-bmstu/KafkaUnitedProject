@@ -15,6 +15,7 @@ object Properties {
   val pathHotelWeather = "C:\\Users\\mvchernov\\work\\201source\\07\\hotel-weather\\"
   val tablePGExpedia = "expedia"
   val tablePGHotelWeather = "hotel_weather"
+  val tableMessages = "kafka_messages"
 
   val propertiesKafka = new Properties()
   propertiesKafka.put("bootstrap.servers", "localhost:9092")

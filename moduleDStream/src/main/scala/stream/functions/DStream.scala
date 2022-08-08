@@ -7,16 +7,16 @@ import org.apache.spark.streaming._
 import org.apache.spark.streaming.kafka010.ConsumerStrategies.Subscribe
 import org.apache.spark.streaming.kafka010.LocationStrategies.PreferConsistent
 import org.apache.spark.streaming.kafka010._
-//import java.util.List
-//import scala.collection.JavaConverters._
 import system._
+import stream.functions._
+
 
 object DStream extends Serializable {
 
   def readStream() : Unit = {
     val columns = Properties.schemaExpedia.fieldNames.toSeq
 
-    def threatLine(spark: SparkSession, str: String)  = {
+    def treatLine(spark: SparkSession, str: String): Unit = {
       import spark.implicits._
       val columns = Properties.schemaExpedia.fieldNames
       println("treating line... " + str)
@@ -26,18 +26,18 @@ object DStream extends Serializable {
         .toSeq
       val rdd = spark.sparkContext.parallelize(dfSeq)
       val df = rdd.toDF()*/
-/*      val cols = Seq("language","users_count")
+      val cols = Seq("language","users_count")
       val data = Seq(("Java", "20000"), ("Python", "100000"), ("Scala", "3000"))
       val rdd = spark.sparkContext.parallelize(data)
       val dfFromRDD1 = rdd.toDF()
-      dfFromRDD1.printSchema()*/
+      dfFromRDD1.printSchema()
     }
 
     def threatRDD(spark: SparkSession, rdd: RDD[String]): DataFrame = {
       import spark.implicits._
       val rddFlat = rdd.flatMap(l => l.split(","))
       //val rddT = spark.sparkContext.parallelize(rddFlat.collect.toSeq.transpose)
-      val df = rddFlat.toDF()
+      val df = rdd.toDF()
       df.show()
       df
     }
@@ -46,6 +46,7 @@ object DStream extends Serializable {
       .appName("DFReader")
       .master("local[2]")
       .getOrCreate()
+
     val ssc = new StreamingContext(spark.sparkContext, Seconds(10))
 
     val kafkaParams = Map[String, Object](
@@ -61,12 +62,23 @@ object DStream extends Serializable {
       PreferConsistent,
       Subscribe[String, String](topic, kafkaParams))
 
+    import spark.implicits._
     val lines = stream.map(_.value)
     lines.foreachRDD(_.foreach(println))
     //lines.foreachRDD(rdd => threatRDD(spark, rdd))
-    lines.foreachRDD(_.foreach(v => threatLine(spark, v)))
+    //lines.foreachRDD(_.foreach(v => treatLine(spark, v)))
+    //lines.foreachRDD(rdd => rdd.saveAsTextFile("./rdds/"))
+
+    lines.foreachRDD(rdd => rdd.toDF()
+      .write
+      .mode("append")
+      .jdbc(Properties.urlPG, Properties.tableMessages, Properties.propertiesPG)
+      )
 
     ssc.start()
     ssc.awaitTermination()
+
+
+
   }
 }
