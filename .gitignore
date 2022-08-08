@@ -1,0 +1,8 @@
+/.idea/*
+/.bsp/
+/project/target
+/project/project
+/target/
+/moduleDStream/target/
+/moduleLoad/target/
+/moduleProducer/target/
