@@ -8,18 +8,14 @@ import system._
 object KafkaProducer {
   def main(DF: DataFrame): Unit = {
     val producer = new KafkaProducer[String, String](Properties.propertiesKafka)
-    val nmbrRows = DF.count()
-    var i: Int = 0
-    while (i < nmbrRows) {
+    val nmbrRows = DF.count().toInt
+    for (i <- 0 until nmbrRows) {
       val currentRow = DF.filter(col("id") === i).collectAsList().toString
       val record = new ProducerRecord(Properties.kafkaTopic, i.toString, currentRow)
       producer.send(record)
       println(i, currentRow)
-      i += 1
-      if (i % 1 == 0) Thread.sleep(10000)
+      if (i % Properties.kafkaProdBatchSize == 0) Thread.sleep(Properties.kafkaProdMessageDelay)
     }
     producer.close()
-
   }
-
 }

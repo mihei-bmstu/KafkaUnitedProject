@@ -23,6 +23,8 @@ object Properties {
   propertiesKafka.put("value.serializer", "org.apache.kafka.common.serialization.StringSerializer")
 
   val kafkaTopic = "testtopic"
+  val kafkaProdBatchSize = 2
+  val kafkaProdMessageDelay = 10000
 
   val schemaExpedia: StructType = StructType(
     StructField("id", LongType, nullable = false) ::
