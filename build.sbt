@@ -10,6 +10,8 @@ val sparkStream = "org.apache.spark" %% "spark-streaming" % sparkVersion
 val streamKafka = "org.apache.spark" %% "spark-streaming-kafka-0-10" % sparkVersion
 val kafka = "org.apache.kafka" % "kafka-clients" % sparkVersion
 val pgDriver = "org.postgresql" % "postgresql" % "42.3.6"
+val sparkAvro = "org.apache.spark" %% "spark-avro" % sparkVersion
+val sparkSQLkafka = "org.apache.spark" %% "spark-sql-kafka-0-10" % sparkVersion
 
 lazy val root = (project in file("."))
   .settings(
@@ -31,14 +33,16 @@ lazy val producer = (project in file("./moduleProducer"))
       pgDriver,
       "org.apache.logging.log4j" % "log4j-api" % "2.17.2",
       "org.apache.logging.log4j" % "log4j-core" % "2.17.2",
-      "org.apache.logging.log4j" % "log4j-slf4j-impl" % "2.17.2")
+      "org.apache.logging.log4j" % "log4j-slf4j-impl" % "2.17.2",
+      sparkAvro,
+      sparkSQLkafka)
   )
   .dependsOn(root)
 
 lazy val dstream = (project in file("./moduleDStream"))
   .settings(
     name := "DStream",
-    libraryDependencies ++= Seq(sparkStream, streamKafka, pgDriver)
+    libraryDependencies ++= Seq(sparkStream, streamKafka, pgDriver, sparkAvro)
   )
   .dependsOn(root)
 

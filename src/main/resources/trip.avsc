@@ -1,0 +1,27 @@
+{
+	"type": "record",
+	"name": "transaction",
+	"namespace": "com.example.models.avro",
+	"fields": [
+		{"name": "channel", "type": "int"},
+		{"name": "data_time", "type": "string"},
+		{"name": "hotel_id", "type": "long"},
+		{"name": "id", "type": "long"},
+		{"name": "is_mobile",  "type": "boolean"},
+		{"name": "is_package", "type": "boolean"},
+		{"name": "orig_destination_distance", "type": "double"},
+		{"name": "posa_container", "type": "string"},
+		{"name": "site_name", "type": "int"},
+		{"name": "srch_adults_cnt", "type": "int"},
+		{"name": "srch_children_cnt", "type": "int"},
+		{"name": "srch_ci", "type": "string"},
+		{"name": "srch_co", "type": "string"},
+		{"name": "srch_destination_id", "type": "long"},
+		{"name": "srch_destination_type_id", "type": "int"},
+		{"name": "srch_rm_cnt", "type": "int"},
+		{"name": "user_id", "type": "long"},
+		{"name": "user_location_city", "type": "int"},
+		{"name": "user_location_country", "type": "int"},
+		{"name": "user_location_region", "type": "int"}
+	]
+}
