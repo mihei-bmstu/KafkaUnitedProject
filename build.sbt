@@ -41,3 +41,10 @@ lazy val dstream = (project in file("./moduleDStream"))
     libraryDependencies ++= Seq(sparkStream, streamKafka, pgDriver)
   )
   .dependsOn(root)
+
+lazy val treatMessage = (project in file("./moduleTreatMessage"))
+  .settings(
+    name := "TreatMessage",
+    libraryDependencies ++= Seq(pgDriver)
+  )
+  .dependsOn(root)
