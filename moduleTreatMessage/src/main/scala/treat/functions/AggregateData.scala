@@ -1,8 +1,10 @@
 package treat.functions
 
 import org.apache.spark.sql.functions._
-import org.apache.spark.sql.{DataFrame, SparkSession}
+import org.apache.spark.sql.types._
+import org.apache.spark.sql.{Column, DataFrame, Row, SparkSession}
 import system.{LoadTable, Properties}
+import scala.annotation.tailrec
 
 object AggregateData {
   def aggregateData(DF: DataFrame, idxStart: Int = 0): Unit = {
@@ -12,37 +14,69 @@ object AggregateData {
       .getOrCreate()
     import spark.implicits._
     val DFWeather = LoadTable.load(Properties.tablePGHotelWeather)
-    val DFSplitted = DF.select(split('value, ",").getItem(0).as("id_"),
-      split('value, ",").getItem(1).as("site_name"),
-      split('value, ",").getItem(2).as("posa_continent"),
-      split('value, ",").getItem(3).as("user_location_country"),
-      split('value, ",").getItem(4).as("user_location_region"),
-      split('value, ",").getItem(5).as("user_location_city"),
-      split('value, ",").getItem(6).as("orig_destination_distance"),
-      split('value, ",").getItem(7).as("user_id"),
-      split('value, ",").getItem(8).as("is_mobile"),
-      split('value, ",").getItem(9).as("is_package"),
-      split('value, ",").getItem(10).as("channel"),
-      split('value, ",").getItem(11).as("srch_adults_cnt"),
-      split('value, ",").getItem(12).as("srch_children_cnt"),
-      split('value, ",").getItem(13).as("srch_rm_cnt"),
-      split('value, ",").getItem(14).as("srch_destination_id"),
-      split('value, ",").getItem(15).as("srch_destination_type_id"),
-      split('value, ",").getItem(16).as("hotel_id"),
-      split('value, ",").getItem(17).as("date_time"),
-      split('value, ",").getItem(18).as("srch_ci"),
-      split('value, ",").getItem(19).as("srch_co_"))
+    val colList = Seq("id_", "site_name",
+      "posa_continent",
+      "user_location_country",
+      "user_location_region",
+      "user_location_city",
+      "orig_destination_distance",
+      "user_id",
+      "is_mobile",
+      "is_package",
+      "channel",
+      "srch_adults_cnt",
+      "srch_children_cnt",
+      "srch_rm_cnt",
+      "srch_destination_id",
+      "srch_destination_type_id",
+      "hotel_id",
+      "date_time",
+      "srch_ci",
+      "srch_co_")
+
+    /*def splitInColumns(source: Column, fields: Seq[String], delimiter: String = ","): Seq[Column] = {
+      val base = split(source, delimiter, -1)
+      fields.zipWithIndex.map { case (field, index) =>
+        base.getItem(index).as(field)
+      }
+    }
+
+    val DFSplitted = DF.select(splitInColumns(col("value"), colList):_*)
       .withColumn("id", regexp_replace(col("id_"), "\\[", ""))
       .withColumn("srch_co", regexp_replace(col("srch_co_"), "\\]", ""))
-      .drop("id_", "srch_co_")
+      .drop("id_", "srch_co_")*/
+
+    @tailrec
+    def splitDF(df: DataFrame, names: Seq[String]): DataFrame = {
+      if (names.isEmpty) df
+      else {
+        val i = colList.length - names.length
+        splitDF(
+          df.withColumn(names.head, split('value, ",",-1).getItem(i)),
+          names.tail
+        )
+      }
+    }
+
+    val DFSplitted = splitDF(DF, colList)
+      .withColumn("id", regexp_replace(col("id_"), "\\[", ""))
+      .withColumn("srch_co", regexp_replace(col("srch_co_"), "\\]", ""))
+      .drop("id_", "srch_co_", "value")
 
     val joinedDF = DFSplitted.join(DFWeather, DFSplitted("hotel_id") === DFWeather("id") &&
     DFSplitted("srch_ci") === DFWeather("wthr_date"))
 
-    val DFhot = joinedDF.filter('avg_tmpr_c > 20)
-    val DFcold = joinedDF.filter('avg_tmpr_c < 20)
+    val DFhot = joinedDF.filter('avg_tmpr_c >= Properties.tempLimit)
+    val DFcold = joinedDF.filter('avg_tmpr_c < Properties.tempLimit)
 
-    DFhot.show()
-    DFcold.show()
+    val DFhotAgg = DFhot.groupBy("hotel_id")
+      .agg(avg("orig_destination_distance").as("avg_hot"))
+
+    val DFcoldAgg = DFcold.groupBy("hotel_id")
+      .agg(avg("orig_destination_distance").as("avg_cold"))
+
+    DFhotAgg.join(DFcoldAgg, "hotel_id")
+      .filter('avg_hot =!= 'avg_cold)
+      .show()
   }
 }
