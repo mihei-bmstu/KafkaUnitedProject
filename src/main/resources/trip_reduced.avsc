@@ -1,0 +1,9 @@
+{
+	"type": "record",
+	"name": "transaction",
+	"namespace": "com.example.models.avro",
+	"fields": [
+		{"name": "channel", "type": "int"},
+		{"name": "data_time", "type": "string"}
+	]
+}

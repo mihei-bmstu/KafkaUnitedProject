@@ -12,11 +12,14 @@ val kafka = "org.apache.kafka" % "kafka-clients" % sparkVersion
 val pgDriver = "org.postgresql" % "postgresql" % "42.3.6"
 val sparkAvro = "org.apache.spark" %% "spark-avro" % sparkVersion
 val sparkSQLkafka = "org.apache.spark" %% "spark-sql-kafka-0-10" % sparkVersion
+val scalike = "org.scalikejdbc" %% "scalikejdbc" % "3.5.0"
+
+resolvers += "confluent" at "https://packages.confluent.io/maven/"
 
 lazy val root = (project in file("."))
   .settings(
     name := "KafkaProjectUnited",
-    libraryDependencies := Seq(core, sql)
+    libraryDependencies := Seq(core, sql, scalike)
   )
 
 lazy val load = (project in file("./moduleLoad"))
@@ -34,6 +37,8 @@ lazy val producer = (project in file("./moduleProducer"))
       "org.apache.logging.log4j" % "log4j-api" % "2.17.2",
       "org.apache.logging.log4j" % "log4j-core" % "2.17.2",
       "org.apache.logging.log4j" % "log4j-slf4j-impl" % "2.17.2",
+      "io.confluent" % "kafka-avro-serializer" % "3.2.1",
+      "ch.qos.logback"  %  "logback-classic"   % "1.2.3",
       sparkAvro,
       sparkSQLkafka)
   )

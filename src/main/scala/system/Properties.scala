@@ -4,12 +4,8 @@ import org.apache.spark.sql.types._
 import java.util.Properties
 
 object Properties {
-
-  val propertiesPG = new Properties()
-  propertiesPG.setProperty("user", "user")
-  propertiesPG.setProperty("password", "user")
-  propertiesPG.setProperty("driver", "org.postgresql.Driver")
-
+  val userPG = "user"
+  val passPG = "user"
   val urlPG = "jdbc:postgresql://localhost:5432/demo"
   val pathExpedia = "C:\\Users\\mvchernov\\work\\201source\\07\\expedia\\"
   val pathHotelWeather = "C:\\Users\\mvchernov\\work\\201source\\07\\hotel-weather\\"
@@ -17,14 +13,31 @@ object Properties {
   val tablePGHotelWeather = "hotel_weather"
   val tableMessages = "kafka_messages"
 
+  val propertiesPG = new Properties()
+  propertiesPG.setProperty("user", userPG)
+  propertiesPG.setProperty("password", passPG)
+  propertiesPG.setProperty("driver", "org.postgresql.Driver")
+
   val propertiesKafka = new Properties()
   propertiesKafka.put("bootstrap.servers", "localhost:9092")
   propertiesKafka.put("key.serializer", "org.apache.kafka.common.serialization.StringSerializer")
-  propertiesKafka.put("value.serializer", "org.apache.kafka.common.serialization.StringSerializer")
+  propertiesKafka.put("value.serializer", "io.confluent.kafka.serializers.KafkaAvroSerializer")
+  propertiesKafka.put("schema.registry.url","http://localhost:8081")
+  //propertiesKafka.put("batch.size","16")
+
+/*  propertiesKafka.put("key.converter","io.confluent.connect.avro.AvroConverter")
+  propertiesKafka.put("key.converter.schema.registry.url","http://localhost:8081")
+  propertiesKafka.put("value.converter","io.confluent.connect.avro.AvroConverter")
+  propertiesKafka.put("value.converter.schema.registry.url","http://localhost:8081")*/
+
+  //propertiesKafka.put("key.serializer", "org.apache.kafka.common.serialization.StringSerializer")
+  //propertiesKafka.put("value.serializer", "org.apache.kafka.common.serialization.StringSerializer")
+  //propertiesKafka.put("value.serializer", "io.confluent.kafka.serializers.KafkaAvroSerializer")
 
   val kafkaTopic = "testtopic"
-  val kafkaProdBatchSize = 2
-  val kafkaProdMessageDelay = 10000
+  val kafkaProdBatchSize = 1
+  val kafkaProdMessageDelay = 1 //millisecond
+  val tempLimit = 20
 
   val schemaExpedia: StructType = StructType(
     StructField("id", LongType, nullable = false) ::
