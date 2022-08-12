@@ -6,9 +6,10 @@ import org.apache.spark.sql.functions._
 import system._
 
 object KafkaProducerString {
-  def main(DF: DataFrame): Unit = {
+  def main(DF: DataFrame, nmbrMessages: Int = 1): Unit = {
     val producer = new KafkaProducer[String, String](Properties.propertiesKafkaString)
-    val nmbrRows = DF.count().toInt
+    val nmbrRows = nmbrMessages.min(DF.count().toInt)
+
     for (i <- 0 until nmbrRows) {
       val currentRow = DF.filter(col("id") === i).collectAsList().toString
       val record = new ProducerRecord(Properties.kafkaTopicString, i.toString, currentRow)

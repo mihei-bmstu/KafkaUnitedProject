@@ -4,6 +4,7 @@ import org.apache.spark.sql.types._
 import java.util.Properties
 
 object Properties {
+  ///////// Postgres settings ///////
   val userPG = "user"
   val passPG = "user"
   val urlPG = "jdbc:postgresql://localhost:5432/demo"
@@ -18,21 +19,27 @@ object Properties {
   propertiesPG.setProperty("password", passPG)
   propertiesPG.setProperty("driver", "org.postgresql.Driver")
 
+
+  /////////// Kafka properties ////////
+  val kafkaHost = "localhost:9092"
+  val shemaRegistry = "http://localhost:8081"
   val propertiesKafkaAvro = new Properties()
-  propertiesKafkaAvro.put("bootstrap.servers", "localhost:9092")
+  propertiesKafkaAvro.put("bootstrap.servers", kafkaHost)
   propertiesKafkaAvro.put("key.serializer", "org.apache.kafka.common.serialization.StringSerializer")
   propertiesKafkaAvro.put("value.serializer", "io.confluent.kafka.serializers.KafkaAvroSerializer")
-  propertiesKafkaAvro.put("schema.registry.url","http://localhost:8081")
+  propertiesKafkaAvro.put("schema.registry.url", shemaRegistry)
 
   val propertiesKafkaString = new Properties()
-  propertiesKafkaString.put("bootstrap.servers", "localhost:9092")
+  propertiesKafkaString.put("bootstrap.servers", kafkaHost)
   propertiesKafkaString.put("key.serializer", "org.apache.kafka.common.serialization.StringSerializer")
   propertiesKafkaString.put("value.serializer", "org.apache.kafka.common.serialization.StringSerializer")
 
   val kafkaTopicAvro = "topicAvro"
   val kafkaTopicString = "topicString"
-  val kafkaProdBatchSize = 1
-  val kafkaProdMessageDelay = 100 //millisecond
+  val kafkaProdBatchSize = 100
+  val kafkaProdMessageDelay = 1000 //millisecond
+
+  ///////////// Aggregation settings //////
   val tempLimit = 20
 
   val schemaExpedia: StructType = StructType(

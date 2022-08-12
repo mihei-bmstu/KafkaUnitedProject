@@ -19,7 +19,7 @@ object DStream extends Serializable {
     val ssc = new StreamingContext(spark.sparkContext, Seconds(10))
 
     val kafkaParams = Map[String, Object](
-      "bootstrap.servers" -> "localhost:9092",
+      "bootstrap.servers" -> Properties.kafkaHost,
       "key.deserializer" -> classOf[StringDeserializer],
       "value.deserializer" -> classOf[StringDeserializer],
       "group.id" -> "consumer-group-2"

@@ -13,19 +13,19 @@ object KafkaProducerAvro {
     val schemaParser = new Parser
     val jsonFormatSchema = new String(Files.readAllBytes(Paths.get("src/main/resources/trip.avsc")))
     val valueSchemaAvro = schemaParser.parse(jsonFormatSchema)
+
     for (i <- 1 to nmbrMessages) {
       val avroRecord = new GenericData.Record(valueSchemaAvro)
       val currentRecords = FetchSQLRecord.findById(i)
-      currentRecords.foreach { currentRecord => {
+      currentRecords.foreach {
+        currentRecord => {
         val fieldsWithValues = classOf[ExpediaRecord].getDeclaredFields.map { f =>
           f.setAccessible(true)
           val res = (f.getName, f.get(currentRecord))
           f.setAccessible(false)
           res
         }.toMap
-        for ((k, v) <- fieldsWithValues) {
-          avroRecord.put(k, v)
-          }
+        for ((k, v) <- fieldsWithValues) { avroRecord.put(k, v) }
         }
       }
       val record = new ProducerRecord(Properties.kafkaTopicAvro, i.toString, avroRecord)

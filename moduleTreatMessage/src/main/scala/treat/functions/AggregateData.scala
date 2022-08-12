@@ -1,8 +1,7 @@
 package treat.functions
 
 import org.apache.spark.sql.functions._
-import org.apache.spark.sql.types._
-import org.apache.spark.sql.{Column, DataFrame, Row, SparkSession}
+import org.apache.spark.sql.{DataFrame, SparkSession}
 import system.{LoadTable, Properties}
 import scala.annotation.tailrec
 
@@ -13,7 +12,9 @@ object AggregateData {
       .appName("DataAggregation")
       .getOrCreate()
     import spark.implicits._
+
     val DFWeather = LoadTable.load(Properties.tablePGHotelWeather)
+
     val colList = Seq("id_", "site_name",
       "posa_continent",
       "user_location_country",
@@ -33,18 +34,6 @@ object AggregateData {
       "date_time",
       "srch_ci",
       "srch_co_")
-
-    /*def splitInColumns(source: Column, fields: Seq[String], delimiter: String = ","): Seq[Column] = {
-      val base = split(source, delimiter, -1)
-      fields.zipWithIndex.map { case (field, index) =>
-        base.getItem(index).as(field)
-      }
-    }
-
-    val DFSplitted = DF.select(splitInColumns(col("value"), colList):_*)
-      .withColumn("id", regexp_replace(col("id_"), "\\[", ""))
-      .withColumn("srch_co", regexp_replace(col("srch_co_"), "\\]", ""))
-      .drop("id_", "srch_co_")*/
 
     @tailrec
     def splitDF(df: DataFrame, names: Seq[String]): DataFrame = {
@@ -70,13 +59,13 @@ object AggregateData {
     val DFcold = joinedDF.filter('avg_tmpr_c < Properties.tempLimit)
 
     val DFhotAgg = DFhot.groupBy("hotel_id")
-      .agg(avg("orig_destination_distance").as("avg_hot"))
+      .agg(avg("srch_adults_cnt").as("avg_hot"))
 
     val DFcoldAgg = DFcold.groupBy("hotel_id")
-      .agg(avg("orig_destination_distance").as("avg_cold"))
+      .agg(avg("srch_adults_cnt").as("avg_cold"))
 
     DFhotAgg.join(DFcoldAgg, "hotel_id")
-      .filter('avg_hot =!= 'avg_cold)
-      .show()
+      .filter('avg_hot === 'avg_cold).show()
+
   }
 }
