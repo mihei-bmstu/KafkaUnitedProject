@@ -18,25 +18,21 @@ object Properties {
   propertiesPG.setProperty("password", passPG)
   propertiesPG.setProperty("driver", "org.postgresql.Driver")
 
-  val propertiesKafka = new Properties()
-  propertiesKafka.put("bootstrap.servers", "localhost:9092")
-  propertiesKafka.put("key.serializer", "org.apache.kafka.common.serialization.StringSerializer")
-  propertiesKafka.put("value.serializer", "io.confluent.kafka.serializers.KafkaAvroSerializer")
-  propertiesKafka.put("schema.registry.url","http://localhost:8081")
-  //propertiesKafka.put("batch.size","16")
+  val propertiesKafkaAvro = new Properties()
+  propertiesKafkaAvro.put("bootstrap.servers", "localhost:9092")
+  propertiesKafkaAvro.put("key.serializer", "org.apache.kafka.common.serialization.StringSerializer")
+  propertiesKafkaAvro.put("value.serializer", "io.confluent.kafka.serializers.KafkaAvroSerializer")
+  propertiesKafkaAvro.put("schema.registry.url","http://localhost:8081")
 
-/*  propertiesKafka.put("key.converter","io.confluent.connect.avro.AvroConverter")
-  propertiesKafka.put("key.converter.schema.registry.url","http://localhost:8081")
-  propertiesKafka.put("value.converter","io.confluent.connect.avro.AvroConverter")
-  propertiesKafka.put("value.converter.schema.registry.url","http://localhost:8081")*/
+  val propertiesKafkaString = new Properties()
+  propertiesKafkaString.put("bootstrap.servers", "localhost:9092")
+  propertiesKafkaString.put("key.serializer", "org.apache.kafka.common.serialization.StringSerializer")
+  propertiesKafkaString.put("value.serializer", "org.apache.kafka.common.serialization.StringSerializer")
 
-  //propertiesKafka.put("key.serializer", "org.apache.kafka.common.serialization.StringSerializer")
-  //propertiesKafka.put("value.serializer", "org.apache.kafka.common.serialization.StringSerializer")
-  //propertiesKafka.put("value.serializer", "io.confluent.kafka.serializers.KafkaAvroSerializer")
-
-  val kafkaTopic = "testtopic"
+  val kafkaTopicAvro = "topicAvro"
+  val kafkaTopicString = "topicString"
   val kafkaProdBatchSize = 1
-  val kafkaProdMessageDelay = 1 //millisecond
+  val kafkaProdMessageDelay = 100 //millisecond
   val tempLimit = 20
 
   val schemaExpedia: StructType = StructType(

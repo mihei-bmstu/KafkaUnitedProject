@@ -35,7 +35,7 @@ object ExpediaRecord extends SQLSyntaxSupport[ExpediaRecord] {
     rs.int("user_location_country"),
     rs.int("user_location_region"),
     rs.int("user_location_city"),
-    rs.double("orig_destination_distance"),
+    rs.doubleOpt("orig_destination_distance").getOrElse(0),
     rs.long("user_id"),
     rs.boolean("is_mobile"),
     rs.boolean("is_package"),

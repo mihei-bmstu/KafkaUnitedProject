@@ -38,11 +38,11 @@ lazy val producer = (project in file("./moduleProducer"))
       "org.apache.logging.log4j" % "log4j-core" % "2.17.2",
       "org.apache.logging.log4j" % "log4j-slf4j-impl" % "2.17.2",
       "io.confluent" % "kafka-avro-serializer" % "3.2.1",
-      "ch.qos.logback"  %  "logback-classic"   % "1.2.3",
       sparkAvro,
       sparkSQLkafka)
   )
   .dependsOn(root)
+//      "ch.qos.logback"  %  "logback-classic"   % "1.2.3",
 
 lazy val dstream = (project in file("./moduleDStream"))
   .settings(
